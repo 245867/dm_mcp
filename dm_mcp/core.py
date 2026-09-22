@@ -453,7 +453,7 @@ class DmCore(object):
             # （后者置 1 会让内存函数把 hwnd 当 PID，读取全失败）。
             #
             # ⚠ 但这两个"调优"接口都必须**容忍不存在**（实测教训，2026-09-22）：
-            #   dm.dll 7.2353 的 COM 后端**没有** SetAsmHwndAsProcessId，
+            #   dm.dll 7.2607 的 COM 后端**没有** SetAsmHwndAsProcessId，
             #   调用直接返回 DM_NOT_SUPPORTED。而它并不是绑定的必要条件 ——
             #   同一轮实测里，这一步失败后 GetModuleBaseAddr(bnsr.exe) 仍取到
             #   0x140000000、读首 4 字节仍是 0x905A4D（MZ 头校验通过）。

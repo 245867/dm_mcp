@@ -1,14 +1,3 @@
----
-AIGC:
-    Label: "1"
-    ContentProducer: 001191440300708461136T1XGW3
-    ProduceID: 744da8a9511249c564847e14fc0e53aa_3bbcd42cb36811f1812e525400248c00
-    ReservedCode1: ol+cWRvtE1AHJk5YsmmSRE+FH7GTy91rTScruj/LBC24C1YIyKGWmr4KVShTP55t9Th4PnU1RDkWQTdX4VzFZ2XRRqLa3ujv+igCtdCaN1zjffyII2ghufbeOqIQzbxq4tG83Uymn1iyvZ1Enq5j8IDwd4ipssom9zNeDFzgUkX6V/CikJqtZIiTtVY=
-    ContentPropagator: 001191440300708461136T1XGW3
-    PropagateID: 744da8a9511249c564847e14fc0e53aa_3bbcd42cb36811f1812e525400248c00
-    ReservedCode2: ol+cWRvtE1AHJk5YsmmSRE+FH7GTy91rTScruj/LBC24C1YIyKGWmr4KVShTP55t9Th4PnU1RDkWQTdX4VzFZ2XRRqLa3ujv+igCtdCaN1zjffyII2ghufbeOqIQzbxq4tG83Uymn1iyvZ1Enq5j8IDwd4ipssom9zNeDFzgUkX6V/CikJqtZIiTtVY=
----
-
 # dm-mcp：大漠插件（DM）MCP 服务
 
 <p>
@@ -33,8 +22,7 @@ AIGC:
 - [四、能力总览](#4-能力总览)
 - [五、安全与风险说明](#5-安全与风险说明)
 - [六、验证状态](#6-验证状态重要务必阅读)
-- [七、后续用途](#7-后续用途第二步衔接)
-- [八、交流与反馈](#8-交流与反馈)
+- [七、交流与反馈](#7-交流与反馈)
 
 ## 硬性约束（本服务的设计前提）
 
@@ -44,8 +32,8 @@ AIGC:
    - **启动自检（默认行为）**：`run_server.py` 启动时先检测自身位数；若当前是 64 位，会自动查找本机 32 位 Python 并**用其重新拉起自身**（stdio 管道继承，MCP 客户端无感）；找不到则打印“获取 / 配置 32 位 Python”的引导文案并以返回码 2 退出，不会静默降级。
    - 指定 32 位解释器的三种方式（优先级由高到低）：`--python32 "D:\Python311-32\python.exe"` → `config.json` 的 `python32_path` → 环境变量 `DM_MCP_PYTHON32`；也可把 32 位解释器放到项目 `python32\python.exe`。
 2. **必须先加载 dm 盾**：`dm_load` → `dm_guard`（默认 `memory2` + `b3`）。未加载盾时，所有内存读/写/搜索/内存操作接口一律返回 `DM_GUARD_NOT_LOADED` 并拒绝执行。
-3. 实测约定（沿用既有工程结论，并已在本机 DM 7.2353 上复验）：读 64 位指针必须 `type=3`；窗口绑定后**不要**置 `SetMemoryHwndAsProcessId(1)`（置 1 会让内存函数把 hwnd 当 PID，读取全失败）；DM 地址为 CE 风格字符串。
-   - 至于 `SetAsmHwndAsProcessId(1)`：既有结论建议调用，但本机 DM 7.2353 的 COM 后端**并没有这个接口**（调用返回 `DM_NOT_SUPPORTED`）。因此本服务把它作为**可选调优**处理——调不通只记 `optional_failed`，不影响绑定与读写，`dm_bind_window` 的返回体会给出说明。
+3. 实测约定（沿用既有工程结论，并已在本机 DM 7.2607 上复验）：读 64 位指针必须 `type=3`；窗口绑定后**不要**置 `SetMemoryHwndAsProcessId(1)`（置 1 会让内存函数把 hwnd 当 PID，读取全失败）；DM 地址为 CE 风格字符串。
+   - 至于 `SetAsmHwndAsProcessId(1)`：既有结论建议调用，但本机 DM 7.2607 的 COM 后端**并没有这个接口**（调用返回 `DM_NOT_SUPPORTED`）。因此本服务把它作为**可选调优**处理——调不通只记 `optional_failed`，不影响绑定与读写，`dm_bind_window` 的返回体会给出说明。
 
 **窗口绑定有两条路径**，服务启动时都会自动执行一次：
 
@@ -171,10 +159,10 @@ sequenceDiagram
 > |---|---|---|
 > | C1 | 新增 `--hwnd`（及 `config.json` 的 `hwnd`），给了它就**严格绑定该句柄**，完全不做窗口查找与类名/标题复核 | 自动查找依赖"类名 == `UnrealWindow` 且标题含《剑灵》"的复核。实测本机存在第三方助手进程持有标题含"剑灵"的窗口，复核虽能拦下误绑，但"我明确知道要绑哪个句柄"时再去找一遍纯属多余 |
 > | C2 | 新增工具 `dm_bind_hwnd`，回显 `source: "explicit-hwnd"` | 让"参数化绑定"成为一个可被 MCP 客户端直接调用的正式能力，而不是只藏在启动参数里 |
-> | C3 | `SetAsmHwndAsProcessId` 与 `AsmSetTimeout` 降为**可选调优**，失败只记 `optional_failed` 不再报错 | dm.dll 7.2353 的 COM 后端**没有** `SetAsmHwndAsProcessId`（返回 `DM_NOT_SUPPORTED`），但它并非绑定必要条件：同轮实测该步失败后 `GetModuleBaseAddr(bnsr.exe)` 仍为 `0x140000000`、首 4 字节仍是 `0x905A4D`。此前把它当致命错误，会制造"窗口已绑好、内存也能读，但服务报告绑定失败"这种最误导人的状态 |
+> | C3 | `SetAsmHwndAsProcessId` 与 `AsmSetTimeout` 降为**可选调优**，失败只记 `optional_failed` 不再报错 | dm.dll 7.2607 的 COM 后端**没有** `SetAsmHwndAsProcessId`（返回 `DM_NOT_SUPPORTED`），但它并非绑定必要条件：同轮实测该步失败后 `GetModuleBaseAddr(bnsr.exe)` 仍为 `0x140000000`、首 4 字节仍是 `0x905A4D`。此前把它当致命错误，会制造"窗口已绑好、内存也能读，但服务报告绑定失败"这种最误导人的状态 |
 >
 > 1.1.3 的实测结论：`dm_status` 回报
-> `dm_version=7.2353`、`registered=true`、`guard_loaded=true`、`bound_hwnd=0x1102b2`、
+> `dm_version=7.2607`、`registered=true`、`guard_loaded=true`、`bound_hwnd=0x1102b2`、
 > `auto_bind.source=explicit-hwnd`；只读链路（load → status → bind → module_base → read MZ）
 > 与读写链路（申请临时内存 → 写 8 字节 → 读回一致 → 释放）全部通过。
 
@@ -317,7 +305,7 @@ dm_read_int(addr="0x14xxxxxx", type=3)                  -> 64 位指针/数值�
 ## 6. 验证状态（重要，务必阅读）
 
 **已在真实环境实测通过**：32 位 Python 3.11.0b5 宿主 + 真实注册码 + 运行中的《剑灵》客户端，
-`dm_version=7.2353`。只读链路（加载 → 注册 → 加载盾 → 绑定 → 取模块基址 → 读 MZ 头）
+`dm_version=7.2607`。只读链路（加载 → 注册 → 加载盾 → 绑定 → 取模块基址 → 读 MZ 头）
 与读写链路（申请临时内存 → 写 8 字节 → 读回一致 → 释放）全部通过；
 HTTP 端到端回归（47 个工具、绑定路径、错误码、真读校验）亦全部通过。
 
@@ -342,15 +330,7 @@ HTTP 端到端回归（47 个工具、绑定路径、错误码、真读校验）
 
 ---
 
-## 7. 后续用途（第二步衔接）
-
-本 MCP 是第一步，第二步准备复用它的读写能力做一层实时覆盖层绘制：先用 `dm_read_int(type=3)` 沿多级指针链把目标对象的数值读出来，再在置顶透明窗口上把这些数值渲染成可视元素，目标是做到实时刷新且不和目标进程抢窗口焦点。
-
-具体的偏移链路与结构体布局属于上层项目的内容，不在本仓库展开。这个仓库只负责把「稳定读出来」这件事做好——把偏移换成什么值，是上层的事。反过来说，只要 `dm_read_int` 对任意 CE 风格地址都能稳定返回数值，上层就能自由迭代，不用回来改 MCP。
-
----
-
-## 8. 交流与反馈
+## 7. 交流与反馈
 
 <div align="center">
 
@@ -370,5 +350,3 @@ HTTP 端到端回归（47 个工具、绑定路径、错误码、真读校验）
 <p><sub>点击上方按钮即可一键加群，无需手动搜索群号</sub></p>
 
 </div>
-
-*（内容由AI生成，仅供参考）*
