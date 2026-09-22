@@ -1,0 +1,115 @@
+# ============================================================================
+# dm-mcp .gitignore
+#   原则：先兜底再精确。宽规则比窄例外安全。
+#   不要为了"保留一个有用的文件"而在宽规则下加窄例外（如 !x64/keep.txt），
+#   一旦有例外，就会有人不断往里塞东西。
+# ============================================================================
+
+# ---------- 本项目凭据与本地配置（最重要，绝不能入库） ----------
+# config.json 含本机 dm.dll 绝对路径、python32 路径，可能含明文 reg_code
+config.json
+# dm_reg.txt 由 setup_once.py 生成，含明文注册码 + 附加码
+dm_reg.txt
+# 一键启动快捷方式内含本机绝对路径与用户名
+*.lnk
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+python32/
+
+# ---------- 编译产物 ----------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.o
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.so
+*.dylib
+*.exe
+*.sys
+
+# ---------- MSVC 中间产物 ----------
+*.tlog
+*.lastbuildstate
+*.recipe
+*.iobj
+*.ipdb
+*.idb
+*.pch
+*.res
+*.aps
+
+# ---------- IDE / 编辑器缓存 ----------
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.ncb
+*.sdf
+*.opensdf
+__history/
+__recovery/
+*.~*
+
+# ---------- 归档与私有发布包 ----------
+# 压缩包常内含构建产物或私有发行包，一律不入库
+*.rar
+*.zip
+*.7z
+*.tar
+*.tar.gz
+
+# ---------- 证书 / 密钥 / 凭据 ----------
+*.pfx
+*.p12
+*.key
+*.pem
+*.cer
+*.crt
+*.pvk
+*.snk
+*.keystore
+appsettings.*.json
+.env
+.env.*
+secrets.*
+*nul*
+
+# ---------- 日志与临时文件 ----------
+*.log
+*.tmp
+*.bak
+*.cache
+Thumbs.db
+.DS_Store
+desktop.ini
+# 本地临时探测脚本目录（非项目源码）
+_tmp/
+
+# ---------- 论坛发帖内容（严禁入库） ----------
+# 发帖素材属于运营资源，不是项目源码；内含推广链接与群号，一旦推送即被爬虫索引
+*_DZ论坛帖子.txt
+*风格*_DZ论坛帖子.txt
+*DZ论坛*.txt
+发帖*.txt
+
+# ---------- 第三方工具遗留的空目录 ----------
+NVIDIA Corporation/
+
+# ---------- 数据 / 数据库 ----------
+*.db
+*.sqlite
+*.sqlite3
