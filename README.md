@@ -1,14 +1,17 @@
+<div align="center">
+
 # dm-mcp：大漠插件（DM）MCP 服务
 
-<p>
-<img alt="语言 Python" src="https://img.shields.io/badge/%E8%AF%AD%E8%A8%80-Python_3_-3776AB?style=for-the-badge&logo=python&logoColor=white&labelColor=24557A">
-&nbsp;
-<img alt="宿主 32 位" src="https://img.shields.io/badge/%E5%AE%BF%E4%B8%BB-32_%E4%BD%8D_-F78166?style=for-the-badge&labelColor=B4442E">
-&nbsp;
-<img alt="工具 47 个" src="https://img.shields.io/badge/%E5%B7%A5%E5%85%B7-47_%E4%B8%AA_-7B68EE?style=for-the-badge&logo=json&logoColor=white&labelColor=4B3FA8">
-&nbsp;
-<img alt="协议 MCP / REST" src="https://img.shields.io/badge/%E5%8D%8F%E8%AE%AE-MCP_/_REST-58A6FF?style=for-the-badge&logo=github&logoColor=white&labelColor=1F6FEB">
-</p>
+**把大漠插件（DM）的内存读写能力封装为 MCP / REST 服务，内置 47 个工具，供上层稳定读写目标进程内存**
+
+[![Language](https://img.shields.io/badge/Python-3-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+![Platform](https://img.shields.io/badge/Platform-Windows%20x86-0078D6?style=for-the-badge)
+![UI](https://img.shields.io/badge/UI-MCP%20%2B%20REST-0A8FCC?style=for-the-badge)
+[![License](https://img.shields.io/badge/License-GPL--3.0-2E7D32?style=for-the-badge&logo=gnu&logoColor=white)](LICENSE)
+
+</div>
+
+---
 
 常驻进程形态的大漠插件服务，**以内存读写为核心能力**，覆盖 DM 的内存读写、内存搜索、目标进程内存操作，以及必要的窗口/进程/输入辅助接口，并以 **MCP（stdio / HTTP JSON-RPC）** 与 **本地 REST 桥** 两种方式对外提供。
 
